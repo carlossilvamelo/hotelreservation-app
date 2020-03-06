@@ -49,6 +49,9 @@
 </template>
 
 <script>
+import axios from "axios";
+axios.defaults.withCredentials = true;
+const baseUrl = "";
 export default {
   name: "HotelReservation",
   mounted(){
@@ -58,23 +61,32 @@ this.selectedClientType = this.clientTypes[0];
     dates: [],
     selectedClientType: "",
     clientTypes:[
-      "type1",
-      "type2"
+      "REGULAR",
+      "REWARDS"
     ],
     menu: false
   }),
   methods:{
-    calculateBestHotel(){
+    async calculateBestHotel(){
 
       const dateList = this.dates.map((date)=>{
        return  new Date(date);
       })
       const payload = {
-        clientType: this.selectedClientType,
+        clientType: this.selectedClientType ,
         dates:dateList
       }
       console.log(payload);
+     await  axios
+      .post(
+        `${baseUrl}hotels/best-price`,
+        payload
+      )
+      .then(response => {
 
+      })
+      .catch(error => {
+      });
      
     }
   }
