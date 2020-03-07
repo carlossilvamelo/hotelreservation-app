@@ -40,25 +40,33 @@
         <v-date-picker v-model="dates" multiple no-title scrollable>
           <v-spacer></v-spacer>
           <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-          <v-btn flat color="primary" @click="$refs.menu.save(dates)">OK</v-btn>
+        
         </v-date-picker>
       </v-menu>
+        <ModalResult :dialog="showModalResult" :hotels="hotelsResult" @confirmationEvent="closeModal()" />
     </v-row>
   </v-layout>
+
  </v-container>
+ 
 </template>
 
 <script>
 import axios from "axios";
-axios.defaults.withCredentials = true;
-const baseUrl = "";
+import ModalResult from "./ModalResult";
+const baseUrl = "http://localhost:8080/";
 export default {
   name: "HotelReservation",
+  components:{
+    ModalResult
+  },
   mounted(){
 this.selectedClientType = this.clientTypes[0];
   },
   data: () => ({
     dates: [],
+    hotelsResult:[],
+    showModalResult: false,
     selectedClientType: "",
     clientTypes:[
       "REGULAR",
@@ -73,21 +81,33 @@ this.selectedClientType = this.clientTypes[0];
        return  new Date(date);
       })
       const payload = {
-        clientType: this.selectedClientType ,
+        costumerType: this.selectedClientType ,
         dates:dateList
       }
-      console.log(payload);
+          var headers = {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+      }
      await  axios
       .post(
         `${baseUrl}hotels/best-price`,
         payload
-      )
+      , headers)
       .then(response => {
+        this.showModalResult = true;
+        this.hotelsResult = response.data;
+         console.log(response.data);
 
       })
       .catch(error => {
+        console.log(error);
+       
       });
      
+    },
+    closeModal(){
+      console.log("close");
+      this.showModalResult = false;
     }
   }
 };
